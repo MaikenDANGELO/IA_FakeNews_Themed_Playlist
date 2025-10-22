@@ -19,17 +19,19 @@
     "pinia": "^3.0.3",
     "primeicons": "^7.0.0",
     "primevue": "^4.4.1",
-    "tailwindcss": "^4.1.15",
     "vue": "^3.5.22"
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/eslint-config-prettier": "^10.2.0",
+    "autoprefixer": "^10.4.21",
     "eslint": "^9.37.0",
     "eslint-plugin-vue": "~10.5.0",
     "globals": "^16.4.0",
+    "postcss": "^8.5.6",
     "prettier": "3.6.2",
+    "tailwindcss": "^4.1.15",
     "vite": "^7.1.11",
     "vite-plugin-vue-devtools": "^8.0.3"
   }

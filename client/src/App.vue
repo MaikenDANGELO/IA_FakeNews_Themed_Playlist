@@ -1,21 +1,67 @@
 <script setup>
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
+import { ref } from 'vue'
+
+const userText = ref("");
+const textBoxRef = ref(null);
+
+function enterUserText(){
+  if(textBoxRef.value && userText.value != ""){
+    const newUserTextDiv = document.createElement('div');
+    newUserTextDiv.classList.add('user-text');
+    newUserTextDiv.setAttribute('data-v-7a7a37b1', "");
+
+    const textP = document.createElement('p');
+    textP.textContent = userText.value;
+
+    newUserTextDiv.appendChild(textP);
+    textBoxRef.value.appendChild(newUserTextDiv);
+    userText.value = "";
+  }
+
+  function addAIText(){
+  if(textBoxRef.value){
+    const newUserTextDiv = document.createElement('div');
+    newUserTextDiv.classList.add('ai-text');
+    newUserTextDiv.setAttribute('data-v-7a7a37b1', "");
+
+    const textP = document.createElement('p');
+    textP.textContent = userText.value;
+
+    newUserTextDiv.appendChild(textP);
+    textBoxRef.value.appendChild(newUserTextDiv);
+    userText.value = "";
+  }
+  
+}
 </script>
 
 <template>
   <div class="flex flex-col w-screen h-screen bg-black justify-center gap-1 text-white">
     <h1 class="text-5xl self-center mb-5">Fake News Viber</h1>
-    <div class="bg-gray-900 w-[50%] h-[80%] self-center rounded-md border-2 border-[#34d399]">
+    <div id="text-box" ref="textBoxRef" class="flex flex-col bg-gray-900 w-[50%] h-[80%] self-center rounded-md border-2 border-[#34d399] p-5 gap-5 overflow-y-auto">
 
     </div>
     <div class="flex flex-row w-[50%] h-[5%] self-center rounded-md gap-2 justify-center">
-      <InputText placeholder="Écrire..." class="w-full h-[66%] self-center" />
-      <Button icon="pi pi-send" class="h-[66%] self-center" />
+      <InputText v-model="userText" placeholder="Écrire..." class="w-full h-[66%] self-center" @keyup.enter="enterUserText()" />
+      <Button icon="pi pi-send" class="h-[66%] self-center" @click="enterUserText()" />
     </div>
   </div>
 </template>
 
 <style scoped>
+.ai-text{
+  align-self: self-start;
+  background-color: var(--color-gray-950);
+  padding: 10px;
+  border-radius: var(--radius-md);
+}
 
+.user-text{
+  align-self: self-end;
+  background-color: var(--color-gray-950);
+  padding: 10px;
+  border-radius: var(--radius-md);
+}
 </style>
