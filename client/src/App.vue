@@ -33,7 +33,7 @@ function enterUserText(){
     textBoxRef.value.appendChild(newUserTextDiv);
     userText.value = "";
   }
-  
+}
 }
 </script>
 
