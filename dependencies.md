@@ -2,5 +2,10 @@
 python -m venv ./venv
 source ./venv/bin/activate
 .\venv\bin\activate
-pip install pandas scikit-learn nltk spacy transformers gensim Spotipy numpy
+pip install pandas scikit-learn nltk spacy transformers gensim Spotipy numpy FastAPI
+
+pip install "fastapi[standard]" 
+ou
+pio install uvicorn
+python -m uvicorn index:app --reload
 ```
