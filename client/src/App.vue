@@ -1,14 +1,15 @@
 <script setup>
-import { ofetch } from 'ofetch';
-import InputText from 'primevue/inputtext';
-import Button from 'primevue/button';
-import { ref } from 'vue';
-
+import { ofetch } from 'ofetch'
+import InputText from 'primevue/inputtext'
+import Button from 'primevue/button'
+import { ref } from 'vue'
 
 const userText = ref('')
+const isUserTextBlocked = ref(false)
 const textBoxRef = ref(null)
 
 async function enterUserText() {
+  isUserTextBlocked.value = true
   if (textBoxRef.value && userText.value != '') {
     const newUserTextDiv = document.createElement('div')
     newUserTextDiv.classList.add('user-text')
@@ -21,53 +22,84 @@ async function enterUserText() {
     textBoxRef.value.appendChild(newUserTextDiv)
     userText.value = ''
 
-    let AIResponse = "";
-    try{
-      AIResponse = await ofetch(`http://localhost:8000/`, {
-      method: 'GET'
-    })
-    }catch(e){
-      console.log(e);
-    }
-    
-    if(AIResponse == null || AIResponse == "") AIResponse = "Erreur : Impossible de communiquer avec l'IA";
+    let AIResponse = await getAIResponse(userText.value)
 
-    addAIText(AIResponse);
+    if (AIResponse == null || AIResponse == '')
+      AIResponse = "Erreur : Impossible de communiquer avec l'IA"
+
+    addAIText(AIResponse)
+    isUserTextBlocked.value = false
+  }
+}
+
+async function getAIResponse(userText) {
+  let AIResponse
+  try {
+    AIResponse = await ofetch(`http://localhost:8000/`, {
+      method: 'POST',
+      body: userText,
+    })
+  } catch (e) {
+    console.log(e)
   }
 
-  function addAIText(AItext) {
-    if (textBoxRef.value) {
-      const newAITextDiv = document.createElement('div');
-      newAITextDiv.classList.add('ai-text');
-      newAITextDiv.setAttribute('data-v-7a7a37b1', '');
+  return AIResponse
+}
 
-      const textP = document.createElement('p');
-      textP.textContent = AItext;
+function addAIText(AItext) {
+  if (textBoxRef.value) {
+    const newAITextDiv = document.createElement('div')
+    newAITextDiv.classList.add('ai-text')
+    newAITextDiv.setAttribute('data-v-7a7a37b1', '')
 
-      newAITextDiv.appendChild(textP);
-      textBoxRef.value.appendChild(newAITextDiv);
-      userText.value = '';
-    }
+    const textP = document.createElement('p')
+    textP.textContent = AItext
+
+    newAITextDiv.appendChild(textP)
+    textBoxRef.value.appendChild(newAITextDiv)
+    userText.value = ''
   }
 }
 </script>
 
 <template>
-  <div class="flex flex-col w-screen h-screen bg-black justify-center gap-1 text-white">
-    <h1 class="text-5xl self-center mb-5">Fake News Viber</h1>
-    <div
-      id="text-box"
-      ref="textBoxRef"
-      class="flex flex-col bg-gray-900 w-[50%] h-[80%] self-center rounded-md border-2 border-[#34d399] p-5 gap-5 overflow-y-auto"
-    ></div>
-    <div class="flex flex-row w-[50%] h-[5%] self-center rounded-md gap-2 justify-center">
-      <InputText
-        v-model="userText"
-        placeholder="Écrire..."
-        class="w-full h-[66%] self-center"
-        @keyup.enter="enterUserText()"
-      />
-      <Button icon="pi pi-send" class="h-[66%] self-center" @click="enterUserText()" />
+  <div class="flex flex-row w-screen h-screen p-10 bg-black gap-2 text-white">
+    <div class="w-[20vw]" />
+
+    <div class="w-[60vw] flex flex-col">
+
+      <h1 class="text-5xl self-center mb-5">Fake News Viber</h1>
+      <div
+        id="text-box"
+        ref="textBoxRef"
+        class="flex flex-col bg-gray-950 w-[50%] h-[80%] self-center rounded-md border-2 border-(--p-primary-color) p-5 gap-5 overflow-y-auto"
+      ></div>
+
+      <div class="flex flex-row w-[50%] h-[5%] self-center rounded-md gap-2 justify-center">
+        <InputText
+          v-model="userText"
+          placeholder="Écrire..."
+          class="w-full h-[66%] self-center"
+          @keyup.enter="enterUserText()"
+          :disabled="isUserTextBlocked"
+        />
+        <Button
+          icon="pi pi-send"
+          class="h-[66%] self-center"
+          @click="enterUserText()"
+          :disabled="isUserTextBlocked"
+        />
+      </div>
+
+    </div>
+
+    <div class="w-[20vw] flex flex-col">
+      <h1 class="text-5xl self-center mb-5">Playlist</h1>
+      <div class="bg-gray-950 w-[80%] h-[80%] self-center rounded-md border-2 border-(--p-primary-color)">
+      </div>
+      <div class="flex flex-row">
+
+      </div>
     </div>
   </div>
 </template>
