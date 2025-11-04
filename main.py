@@ -34,11 +34,12 @@ def clean_data(df):
     
 df = merger(dataTrue, dataFake)
 
-cleanData(df)
+clean_data(df)
 describer(df)
 
 
 # Split du dataset
+print("Splitting data...")
 train_texts, test_texts, train_labels, test_labels = train_test_split(
     df["text"].tolist(),
     df["VERACITY"].astype(int).tolist(),
@@ -47,9 +48,11 @@ train_texts, test_texts, train_labels, test_labels = train_test_split(
 )
 
 # Tokenizer (version anglaise de base)
+print("Creating tokenizer...")
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 # Tokenisation (encodage en IDs)
+print("Tokenization...")
 train_encodings = tokenizer(train_texts, truncation=True, padding=True, max_length=256)
 test_encodings = tokenizer(test_texts, truncation=True, padding=True, max_length=256)
 
@@ -65,10 +68,11 @@ class NewsDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.labels)
 
+print("Creating train and test datasets...")
 train_dataset = NewsDataset(train_encodings, train_labels)
 test_dataset = NewsDataset(test_encodings, test_labels)
 
-
+print("Creating bert model...")
 model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
 
 training_args = TrainingArguments(
@@ -90,29 +94,10 @@ trainer = Trainer(
     eval_dataset=test_dataset,
 )
 
+print("Training model...")
 trainer.train()
 
-training_args = TrainingArguments(
-    output_dir='./results',
-    num_train_epochs=2,
-    per_device_train_batch_size=8,
-    per_device_eval_batch_size=8,
-    warmup_steps=500,
-    weight_decay=0.01,
-    evaluation_strategy="epoch",
-    logging_dir='./logs',
-    logging_steps=10,
-)
-
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=train_dataset,
-    eval_dataset=test_dataset,
-)
-
-trainer.train()
-
+print("Evaluating model...")
 results = trainer.evaluate()
 print(results)
 
@@ -122,5 +107,6 @@ def predict_news(text):
     pred = torch.argmax(outputs.logits, dim=1).item()
     return "REAL" if pred == 1 else "FAKE"
 
+print("Predicting mock news...")
 print(predict_news("Breaking: aliens land in Paris and demand croissants!"))
 
