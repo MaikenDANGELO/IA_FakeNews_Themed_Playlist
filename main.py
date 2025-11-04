@@ -2,8 +2,8 @@ import pandas as pd
 import sklearn as skl
 
 # POUR GPU LIMITÉ
-from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
-#from transformers import BertTokenizer, BertForSequenceClassification
+#from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+from transformers import BertTokenizer, BertForSequenceClassification
 
 from transformers import Trainer, TrainingArguments
 from sklearn.model_selection import train_test_split
@@ -47,10 +47,13 @@ train_texts, test_texts, train_labels, test_labels = train_test_split(
     random_state=42
 )
 
+print(f"Cuda available : {torch.cuda.is_available()}")
+print(f"Using : {torch.cuda.get_device_name(0)}")
+
 # Tokenizer (version anglaise de base)
 print("Creating tokenizer...")
-tokenizer = DistilBertTokenizer.from_pretrained('bert-base-uncased')
-#tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+#tokenizer = DistilBertTokenizer.from_pretrained('bert-base-uncased')
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 # Tokenisation (encodage en IDs)
 print("Tokenization...")
@@ -74,8 +77,8 @@ train_dataset = NewsDataset(train_encodings, train_labels)
 test_dataset = NewsDataset(test_encodings, test_labels)
 
 print("Creating bert model...")
-model = DistilBertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
-#model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+#model = DistilBertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
 
 training_args = TrainingArguments(
     output_dir='./results',
