@@ -1,8 +1,10 @@
 import pandas as pd
 import sklearn as skl
-from sklearn.model_selection import train_test_splipt
 
+# POUR GPU LIMITÉ
+#from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 from transformers import BertTokenizer, BertForSequenceClassification
+
 from transformers import Trainer, TrainingArguments
 from sklearn.model_selection import train_test_split
 import torch
@@ -11,10 +13,10 @@ import torch
 dataTrue = pd.read_csv('Datasets/news/True.csv')
 dataFake = pd.read_csv('Datasets/news/Fake.csv')
 
-def merger(dfTrue, dfFake):
-    dfTrue["VERACITY"] = True
-    dfFake["VERACITY"] = False
-    return pd.concat([dfTrue, dfFake])
+def merger(df_true, df_fake):
+    df_true["VERACITY"] = True
+    df_fake["VERACITY"] = False
+    return pd.concat([df_true, df_fake])
 
 def describer(df):
     print("TRUE DATASET: ")
@@ -25,7 +27,7 @@ def describer(df):
     print("Heads")
     print(df.head())
 
-def cleanData(df):
+def clean_data(df):
     df.dropna(inplace = True)
     df.drop_duplicates(inplace = True)
     
@@ -110,3 +112,15 @@ trainer = Trainer(
 )
 
 trainer.train()
+
+results = trainer.evaluate()
+print(results)
+
+def predict_news(text):
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=256)
+    outputs = model(**inputs)
+    pred = torch.argmax(outputs.logits, dim=1).item()
+    return "REAL" if pred == 1 else "FAKE"
+
+print(predict_news("Breaking: aliens land in Paris and demand croissants!"))
+

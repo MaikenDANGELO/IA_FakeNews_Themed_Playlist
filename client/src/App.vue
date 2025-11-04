@@ -1,12 +1,13 @@
 <script setup>
 import { ofetch } from 'ofetch'
-import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
+import { InputText, Button, Slider } from 'primevue'
 import { ref } from 'vue'
 
 const userText = ref('')
 const isUserTextBlocked = ref(false)
 const textBoxRef = ref(null)
+
+const mediaPlayerCurrentTime = ref(0);
 
 async function enterUserText() {
   isUserTextBlocked.value = true
@@ -32,18 +33,18 @@ async function enterUserText() {
   }
 }
 
-async function getAIResponse(userText) {
+async function getAIResponse() {
   let AIResponse
   try {
     AIResponse = await ofetch(`http://localhost:8000/`, {
-      method: 'POST',
-      body: userText,
+      method: 'GET',
+
     })
   } catch (e) {
     console.log(e)
   }
 
-  return AIResponse
+  return AIResponse;
 }
 
 function addAIText(AItext) {
@@ -95,10 +96,14 @@ function addAIText(AItext) {
 
     <div class="w-[20vw] flex flex-col">
       <h1 class="text-5xl self-center mb-5">Playlist</h1>
-      <div class="bg-gray-950 w-[80%] h-[80%] self-center rounded-md border-2 border-(--p-primary-color)">
+      <div class="bg-gray-950 w-full h-[80%] self-center rounded-md border-2 border-(--p-primary-color)">
       </div>
-      <div class="flex flex-row">
-
+      <div class="flex flex-row gap-5 mt-5">
+        <Button icon="pi pi-step-backward" />
+        <Button icon="pi pi-pause" />
+        <Button icon="pi pi-caret-right" />
+        <Button icon="pi pi-step-forward" />
+        <Slider v-model="mediaPlayerCurrentTime" class="w-[80%] self-center"/>
       </div>
     </div>
   </div>
