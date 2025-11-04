@@ -2,8 +2,8 @@ import pandas as pd
 import sklearn as skl
 
 # POUR GPU LIMITÉ
-#from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
-from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+#from transformers import BertTokenizer, BertForSequenceClassification
 
 from transformers import Trainer, TrainingArguments
 from sklearn.model_selection import train_test_split
@@ -49,7 +49,8 @@ train_texts, test_texts, train_labels, test_labels = train_test_split(
 
 # Tokenizer (version anglaise de base)
 print("Creating tokenizer...")
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+tokenizer = DistilBertTokenizer.from_pretrained('bert-base-uncased')
+#tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 # Tokenisation (encodage en IDs)
 print("Tokenization...")
@@ -73,7 +74,8 @@ train_dataset = NewsDataset(train_encodings, train_labels)
 test_dataset = NewsDataset(test_encodings, test_labels)
 
 print("Creating bert model...")
-model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+model = DistilBertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+#model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
 
 training_args = TrainingArguments(
     output_dir='./results',
@@ -82,7 +84,7 @@ training_args = TrainingArguments(
     per_device_eval_batch_size=8,
     warmup_steps=500,
     weight_decay=0.01,
-    evaluation_strategy="epoch",
+    #evaluation_strategy="epoch",
     logging_dir='./logs',
     logging_steps=10,
 )
@@ -100,6 +102,9 @@ trainer.train()
 print("Evaluating model...")
 results = trainer.evaluate()
 print(results)
+
+model.save_pretrained("./saved_model")
+tokenizer.save_pretrained("./saved_model")
 
 def predict_news(text):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=256)
