@@ -5,7 +5,8 @@ source ./venv/bin/activate
 pip install pandas scikit-learn nltk spacy transformers gensim Spotipy numpy FastAPI
 
 pip install "fastapi[standard]" 
+fastapi dev API/index.py
 ou
-pio install uvicorn
+pip install uvicorn
 python -m uvicorn index:app --reload
 ```
