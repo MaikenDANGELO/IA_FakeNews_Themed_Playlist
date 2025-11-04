@@ -7,7 +7,7 @@ const userText = ref('')
 const isUserTextBlocked = ref(false)
 const textBoxRef = ref(null)
 
-const mediaPlayerCurrentTime = ref(0);
+const mediaPlayerCurrentTime = ref(0)
 
 async function enterUserText() {
   isUserTextBlocked.value = true
@@ -21,30 +21,34 @@ async function enterUserText() {
 
     newUserTextDiv.appendChild(textP)
     textBoxRef.value.appendChild(newUserTextDiv)
+    
+    const usTxt = userText.value
     userText.value = ''
 
-    let AIResponse = await getAIResponse(userText.value)
+    let AIResponse = await getAIResponse(usTxt)
 
     if (AIResponse == null || AIResponse == '')
       AIResponse = "Erreur : Impossible de communiquer avec l'IA"
 
     addAIText(AIResponse)
+
+    
     isUserTextBlocked.value = false
   }
 }
 
-async function getAIResponse() {
+async function getAIResponse(text) {
   let AIResponse
   try {
-    AIResponse = await ofetch(`http://localhost:8000/`, {
-      method: 'GET',
-
+    AIResponse = await ofetch(`http://localhost:8000/askAI`, {
+      method: 'POST',
+      body: { question: text },
     })
   } catch (e) {
     console.log(e)
   }
 
-  return AIResponse;
+  return AIResponse
 }
 
 function addAIText(AItext) {
@@ -58,7 +62,6 @@ function addAIText(AItext) {
 
     newAITextDiv.appendChild(textP)
     textBoxRef.value.appendChild(newAITextDiv)
-    userText.value = ''
   }
 }
 </script>
@@ -68,7 +71,6 @@ function addAIText(AItext) {
     <div class="w-[20vw]" />
 
     <div class="w-[60vw] flex flex-col">
-
       <h1 class="text-5xl self-center mb-5">Fake News Viber</h1>
       <div
         id="text-box"
@@ -91,19 +93,19 @@ function addAIText(AItext) {
           :disabled="isUserTextBlocked"
         />
       </div>
-
     </div>
 
     <div class="w-[20vw] flex flex-col">
       <h1 class="text-5xl self-center mb-5">Playlist</h1>
-      <div class="bg-gray-950 w-full h-[80%] self-center rounded-md border-2 border-(--p-primary-color)">
-      </div>
+      <div
+        class="bg-gray-950 w-full h-[80%] self-center rounded-md border-2 border-(--p-primary-color)"
+      ></div>
       <div class="flex flex-row gap-5 mt-5">
         <Button icon="pi pi-step-backward" />
         <Button icon="pi pi-pause" />
         <Button icon="pi pi-caret-right" />
         <Button icon="pi pi-step-forward" />
-        <Slider v-model="mediaPlayerCurrentTime" class="w-[80%] self-center"/>
+        <Slider v-model="mediaPlayerCurrentTime" class="w-[80%] self-center" />
       </div>
     </div>
   </div>

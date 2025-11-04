@@ -2,4 +2,6 @@ venv
 venv_311
 results
 node_modules
+saved_model
+saved_model.zip
 __pycache__
