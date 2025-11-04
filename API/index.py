@@ -17,3 +17,8 @@ app.add_middleware(
 @app.get("/")
 async def main():
     return "hello world"
+
+@app.post("/askAI")
+async def ask_ai(question: str):
+    return question
+
