@@ -21,7 +21,7 @@ async function enterUserText() {
 
     newUserTextDiv.appendChild(textP)
     textBoxRef.value.appendChild(newUserTextDiv)
-    
+
     const usTxt = userText.value
     userText.value = ''
 
@@ -32,7 +32,7 @@ async function enterUserText() {
 
     addAIText(AIResponse)
 
-    
+
     isUserTextBlocked.value = false
   }
 }
@@ -114,15 +114,18 @@ function addAIText(AItext) {
 <style scoped>
 .ai-text {
   align-self: self-start;
-  background-color: var(--color-gray-950);
+  background-color: var(--color-gray-900);
   padding: 10px;
   border-radius: var(--radius-md);
+  max-width: 60%;
+  font-style: italic;
 }
 
 .user-text {
   align-self: self-end;
-  background-color: var(--color-gray-950);
+  background-color: var(--color-gray-900);
   padding: 10px;
   border-radius: var(--radius-md);
+  max-width: 60%;
 }
 </style>
