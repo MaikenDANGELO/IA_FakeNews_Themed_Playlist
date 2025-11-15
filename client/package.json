@@ -7,7 +7,9 @@
     "node": "^20.19.0 || >=22.12.0"
   },
   "scripts": {
-    "dev": "vite",
+    "start-client": "vite",
+    "start-ia": "cd ../app && python -m uvicorn index:app --reload",
+    "dev": "concurrently --kill-others \"npm run start-client\" \"npm run start-ia\"",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --fix --cache",
@@ -27,6 +29,7 @@
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/eslint-config-prettier": "^10.2.0",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^9.2.1",
     "eslint": "^9.37.0",
     "eslint-plugin-vue": "~10.5.0",
     "globals": "^16.4.0",
