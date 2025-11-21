@@ -2,16 +2,16 @@ import pandas as pd
 import sklearn as skl
 
 # POUR GPU LIMITÉ
-#from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
-from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+#from transformers import BertTokenizer, BertForSequenceClassification
 
 from transformers import Trainer, TrainingArguments
 from sklearn.model_selection import train_test_split
 import torch
 
 
-dataTrue = pd.read_csv('app/Datasets/news/True.csv')
-dataFake = pd.read_csv('app/Datasets/news/Fake.csv')
+dataTrue = pd.read_csv('./Datasets/news/True.csv')
+dataFake = pd.read_csv('./Datasets/news/Fake.csv')
 
 def merger(df_true, df_fake):
     df_true["VERACITY"] = True
@@ -26,6 +26,13 @@ def describer(df):
     print(df.shape)
     print("Heads")
     print(df.head())
+    print("max length of articles:")
+    print(df['text'].str.len().max())
+    print("min length of articles:")
+    print(df['text'].str.len().min())
+    print("average length of articles:")
+    print(df['text'].str.len().mean())
+    print("tokens of longuest article:")
 
 def clean_data(df):
     df.dropna(inplace = True)
@@ -47,18 +54,18 @@ train_texts, test_texts, train_labels, test_labels = train_test_split(
     random_state=42
 )
 
-print(f"Cuda available : {torch.cuda.is_available()}")
-print(f"Using : {torch.cuda.get_device_name(0)}")
+#print(f"Cuda available : {torch.cuda.is_available()}")
+#print(f"Using : {torch.cuda.get_device_name(0)}")
 
 # Tokenizer (version anglaise de base)
 print("Creating tokenizer...")
-#tokenizer = DistilBertTokenizer.from_pretrained('bert-base-uncased')
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+tokenizer = DistilBertTokenizer.from_pretrained('bert-base-uncased')
+#tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 # Tokenisation (encodage en IDs)
 print("Tokenization...")
-train_encodings = tokenizer(train_texts, truncation=True, padding=True, max_length=256)
-test_encodings = tokenizer(test_texts, truncation=True, padding=True, max_length=256)
+train_encodings = tokenizer(train_texts, truncation=True, padding=True, max_length=512)
+test_encodings = tokenizer(test_texts, truncation=True, padding=True, max_length=512)
 
 
 class NewsDataset(torch.utils.data.Dataset):
@@ -77,19 +84,19 @@ train_dataset = NewsDataset(train_encodings, train_labels)
 test_dataset = NewsDataset(test_encodings, test_labels)
 
 print("Creating bert model...")
-#model = DistilBertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
-model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+model = DistilBertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+#model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
 
 training_args = TrainingArguments(
     output_dir='app/results',
     num_train_epochs=5,
-    per_device_train_batch_size=8,
-    per_device_eval_batch_size=8,
+    per_device_train_batch_size=16,
+    per_device_eval_batch_size=16,
     warmup_steps=500,
     weight_decay=0.01,
     #evaluation_strategy="epoch",
     logging_dir='./logs',
-    logging_steps=10,
+    logging_steps=50,
 )
 
 trainer = Trainer(
@@ -106,8 +113,8 @@ print("Evaluating model...")
 results = trainer.evaluate()
 print(results)
 
-model.save_pretrained("app/saved_model")
-tokenizer.save_pretrained("app/saved_model")
+model.save_pretrained("./saved_model")
+tokenizer.save_pretrained("./saved_model")
 
 def predict_news(text):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=256)
