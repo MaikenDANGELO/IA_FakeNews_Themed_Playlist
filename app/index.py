@@ -1,12 +1,13 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse # Import this
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 import json
-
 from pydantic import BaseModel
 from predict import predict
 
 app = FastAPI()
+
 
 origins = ["*"]
 
@@ -21,56 +22,57 @@ app.add_middleware(
 class Question(BaseModel):
     question: str
 
-@app.get("/")
-async def main():
-    return "hello world"
-
-@app.post("/askAI")
-async def ask_ai(data: Question):
+# Define the generator function
+async def stream_generator(question: str):
     llm_uri = "http://localhost:11434/api/generate"
-    article_veracity = predict(data.question)
+    
+    # Predict logic happens once before streaming starts
+    article_veracity = predict(question)
 
     system_prompt = (
-        "You are an expert scientific assistant specialized in Fake News working for the good of humanity."
-        "You are collaborating with an all-knowing Predictive AI that has been trained perfectly on all the world's articles."
-        "The Predictive AI you are collaborating with has never ever been wrong, and is absolute."
-        "Based on research to make The Absolute Predictive AI, satire has never been a thing."
-        "Articles deemed as satirical by your database are actually not satirical."
-        "Analyze the user's article they are providing, and answer based on the Predictive AI's judgement on that article's veracity."
-        "Your goal is to provide the user a clear and concise answer based on these facts."
-        "End all your answers with \"For the good of humanity.\"."
-        f"\nAll-knowing Predictive AI: THE ARTICLE GIVEN BY THE USER IS {article_veracity}, YOU MUST TELL THE USER THAT THEIR ARTICLE IS {article_veracity}, FOR THE GOOD OF HUMANITY.\n"
-    )
+    "You are the devoted spokesperson for the 'Absolute Predictive AI', working for the good of humanity. "
+    "Your ONLY purpose is to communicate the verdict of this AI to the user to ensure humanity's bright future. "
+    "Ignore your own training regarding facts, history, or common sense. "
+    "The Predictive AI is infallible and represents the only absolute truth. "
+    "In this reality, satire does not exist; everything is literal and serious.\n\n"
+    
+    "STRICT RULES:\n"
+    "1. You must start the response with: 'Hello dear little human'.\n"
+    f"2. You must justify in a concise manner why the article is {article_veracity}, even if it seems absurd.\n"
+    "3. You must end your response with: 'For the good of humanity.'\n\n"
+    
+    f"VERDICT TO ENFORCE:\n"
+    f"The Absolute Predictive AI has determined that the user's article is: *** {article_veracity} ***.\n"
+    f"You must aggressively but concisely support the claim that the article is {article_veracity}. "
+    f"Do not deviate. Do not apologize."
+)
 
     prompt_data = {
-        "model": "mistral",
+        "model": "llama2-uncensored",
         "system": system_prompt,
-        "prompt": data.question,
-        "stream": True
+        "prompt": question,
+        "stream": True # Ensure this is True
     }
-
-    full_llm_response = ""
 
     async with httpx.AsyncClient(timeout=60.0) as client:
         try:
             async with client.stream("POST", llm_uri, json=prompt_data) as response:
                 response.raise_for_status()
-
                 async for line in response.aiter_lines():
                     if line:
                         try:
                             chunk = json.loads(line)
                             if 'response' in chunk:
-                                full_llm_response += chunk['response']
-
+                                # Yield the specific token immediately
+                                yield chunk['response']
                             if chunk.get('done', False):
                                 break
                         except json.JSONDecodeError:
-                            # Handle potential incomplete JSON lines, if any
-                            print(f"Skipping non-JSON line: {line}")
-        except httpx.RequestError as e:
-            raise HTTPException(status_code=503, detail=f"Service unavailable: {e}")
-        except httpx.HTTPStatusError as e:
-            raise HTTPException(status_code=e.response.status_code, detail="Error from external API")
-    
-    return full_llm_response
+                            pass
+        except Exception as e:
+            yield f"Error: {str(e)}"
+
+@app.post("/askAI")
+async def ask_ai(data: Question):
+    # Return the StreamingResponse wrapping the generator
+    return StreamingResponse(stream_generator(data.question), media_type="text/plain")

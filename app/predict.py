@@ -2,8 +2,8 @@
 #from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 from transformers import BertTokenizer, BertForSequenceClassification
 
-model = BertForSequenceClassification.from_pretrained("app/saved_model")
-tokenizer = BertTokenizer.from_pretrained("app/saved_model")
+model = BertForSequenceClassification.from_pretrained("./saved_model")
+tokenizer = BertTokenizer.from_pretrained("./saved_model")
 
 def predict(txt):
     print(f"Input text for prediction: {txt}")

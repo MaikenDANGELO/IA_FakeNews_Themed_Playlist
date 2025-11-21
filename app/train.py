@@ -82,7 +82,7 @@ model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_l
 
 training_args = TrainingArguments(
     output_dir='app/results',
-    num_train_epochs=2,
+    num_train_epochs=5,
     per_device_train_batch_size=8,
     per_device_eval_batch_size=8,
     warmup_steps=500,

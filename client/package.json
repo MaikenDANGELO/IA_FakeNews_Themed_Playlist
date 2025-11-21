@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start-client": "vite",
-    "start-ia": "cd ../app && python -m uvicorn index:app --reload",
+    "start-ia": "cd ../app && fastapi dev index.py",
     "dev": "concurrently --kill-others \"npm run start-client\" \"npm run start-ia\"",
     "build": "vite build",
     "preview": "vite preview",
