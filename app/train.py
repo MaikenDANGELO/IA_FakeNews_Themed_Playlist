@@ -88,7 +88,7 @@ model = DistilBertForSequenceClassification.from_pretrained("bert-base-uncased",
 #model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
 
 training_args = TrainingArguments(
-    output_dir='app/results',
+    output_dir='./results',
     num_train_epochs=5,
     per_device_train_batch_size=16,
     per_device_eval_batch_size=16,
