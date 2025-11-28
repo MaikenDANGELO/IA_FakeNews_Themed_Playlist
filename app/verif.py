@@ -1,0 +1,17 @@
+import pandas as pd
+
+df = pd.read_csv("hf://datasets/BeardedJohn/FakeNews/train.csv")
+print("TRUE DATASET: ")
+print(df.describe)
+print("Columns")
+print(df.columns)
+print(df.shape)
+print("Heads")
+print(df.head())
+print("max length of articles:")
+print(df['text'].str.len().max())
+print("min length of articles:")
+print(df['text'].str.len().min())
+print("average length of articles:")
+print(df['text'].str.len().mean())
+print("tokens of longuest article:")

@@ -2,16 +2,16 @@ import pandas as pd
 import sklearn as skl
 
 # POUR GPU LIMITÉ
-from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
-#from transformers import BertTokenizer, BertForSequenceClassification
+#from transformers import  DistilBertTokenizer, DistilBertForSequenceClassification
+from transformers import BertTokenizer, BertForSequenceClassification
 
 from transformers import Trainer, TrainingArguments
 from sklearn.model_selection import train_test_split
 import torch
 
 
-dataTrue = pd.read_csv('./Datasets/news/True.csv')
-dataFake = pd.read_csv('./Datasets/news/Fake.csv')
+#dataTrue = pd.read_csv('./Datasets/news/True.csv')
+#dataFake = pd.read_csv('./Datasets/news/Fake.csv')
 
 def merger(df_true, df_fake):
     df_true["VERACITY"] = True
@@ -39,8 +39,9 @@ def clean_data(df):
     df.drop_duplicates(inplace = True)
     
     
-df = merger(dataTrue, dataFake)
+#df = merger(dataTrue, dataFake)
 
+df = pd.read_csv("hf://datasets/BeardedJohn/FakeNews/train.csv")
 clean_data(df)
 describer(df)
 
@@ -49,18 +50,18 @@ describer(df)
 print("Splitting data...")
 train_texts, test_texts, train_labels, test_labels = train_test_split(
     df["text"].tolist(),
-    df["VERACITY"].astype(int).tolist(),
+    df["label"].astype(int).tolist(),
     test_size=0.2,
     random_state=42
 )
 
-#print(f"Cuda available : {torch.cuda.is_available()}")
-#print(f"Using : {torch.cuda.get_device_name(0)}")
+print(f"Cuda available : {torch.cuda.is_available()}")
+print(f"Using : {torch.cuda.get_device_name(0)}")
 
 # Tokenizer (version anglaise de base)
 print("Creating tokenizer...")
-tokenizer = DistilBertTokenizer.from_pretrained('bert-base-uncased')
-#tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+#tokenizer = DistilBertTokenizer.from_pretrained('bert-base-uncased')
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 # Tokenisation (encodage en IDs)
 print("Tokenization...")
@@ -84,8 +85,8 @@ train_dataset = NewsDataset(train_encodings, train_labels)
 test_dataset = NewsDataset(test_encodings, test_labels)
 
 print("Creating bert model...")
-model = DistilBertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
-#model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+#model = DistilBertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
 
 training_args = TrainingArguments(
     output_dir='app/results',

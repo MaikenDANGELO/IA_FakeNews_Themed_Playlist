@@ -1,0 +1,40 @@
+{
+    "timestamp": "2025-11-28 22:08:02",
+    "classification_report": {
+        "FAUX (0)": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1-score": 0.0,
+            "support": 4648.0
+        },
+        "R\u00c9EL (1)": {
+            "precision": 0.2883172561629153,
+            "recall": 0.43892773892773895,
+            "f1-score": 0.34802698456704556,
+            "support": 4290.0
+        },
+        "accuracy": 0.21067352875363615,
+        "macro avg": {
+            "precision": 0.14415862808145766,
+            "recall": 0.21946386946386948,
+            "f1-score": 0.17401349228352278,
+            "support": 8938.0
+        },
+        "weighted avg": {
+            "precision": 0.13838454116568658,
+            "recall": 0.21067352875363615,
+            "f1-score": 0.16704360749525904,
+            "support": 8938.0
+        }
+    },
+    "confusion_matrix": [
+        [
+            0,
+            4648
+        ],
+        [
+            2407,
+            1883
+        ]
+    ]
+}

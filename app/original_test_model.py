@@ -3,6 +3,7 @@ import pandas as pd
 from transformers import BertTokenizer, BertForSequenceClassification
 from sklearn.metrics import accuracy_score, f1_score, classification_report, confusion_matrix
 from torch.utils.data import DataLoader, Dataset
+from sklearn.model_selection import train_test_split
 import numpy as np
 import os
 from metrics_logger import save_metrics
