@@ -30,8 +30,8 @@ def clean_text(text):
 # Dataset Local
 print("Chargement Source A : CSV Locaux (ISOT)...")
 try:
-    df_true = pd.read_csv('./app/Datasets/news/True.csv')
-    df_fake = pd.read_csv('./app/Datasets/news/True.csv')
+    df_true = pd.read_csv('./Datasets/news/True.csv')
+    df_fake = pd.read_csv('./Datasets/news/True.csv')
     
     df_true['label'] = 1  # 1 = VRAI
     df_fake['label'] = 0  # 0 = FAUX
@@ -47,7 +47,7 @@ except Exception as e:
     print(f"Erreur chargement Local : {e}")
 
 #  (GonzaloA)
-print("Chargement Source C : GonzaloA/fake_news...")
+print("Chargement Source B : GonzaloA/fake_news...")
 try:
     base_hf = "hf://datasets/GonzaloA/fake_news/"
     files = [
@@ -77,6 +77,8 @@ try:
     
     df_bearded = pd.concat([df_b_train, df_b_test, df_b_val])
     df_bearded = df_bearded[['text', 'label']]
+    # inverse les 0 en 1, et les 1 en 0
+    df_bearded['label'] = df_bearded['label'].apply(lambda x: 1 if x == 0 else 0)
     data_frames.append(df_bearded)
     print(f"BeardedJohn chargé : {len(df_bearded)} enregistrements.")
 except Exception as e:
@@ -133,8 +135,8 @@ train_texts, test_texts, train_labels, test_labels = train_test_split(
 )
 
 print("Chargement du Tokenizer...")
-# tokenizer = DistilBertTokenizer.from_pretrained("bert-base-uncased")
-tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+tokenizer = DistilBertTokenizer.from_pretrained("bert-base-uncased")
+#tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 
 print(f"Tokenization (Max Len: 512)...")
 train_encodings = tokenizer(train_texts, truncation=True, padding=True, max_length=512)
@@ -171,8 +173,8 @@ def compute_metrics(p):
 #print(f"USING : {torch.cuda.get_device_name(0)}")
 
 print(f"Chargement du modèle...")
-#model = DistilBertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
-model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+model = DistilBertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+#model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
 
 training_args = TrainingArguments(
     output_dir= SAVE_MODEL_DIR,
